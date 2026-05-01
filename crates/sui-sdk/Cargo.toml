@@ -30,6 +30,9 @@ tokio.workspace = true
 bcs.workspace = true
 thiserror.workspace = true
 reqwest.workspace = true
+# Added for the IPC dry-run path used by the sui-mev arb bot. Small,
+# well-maintained crate; only used by the optional ipc_client module.
+interprocess = { version = "2", features = ["tokio"] }
 
 mysten-common.workspace = true
 sui-json-rpc-api.workspace = true

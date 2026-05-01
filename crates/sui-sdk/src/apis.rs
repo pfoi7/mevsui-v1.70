@@ -649,6 +649,30 @@ impl ReadApi {
             .await?)
     }
 
+    /// Variant of `dry_run_transaction_block` that takes a set of object
+    /// overrides applied on top of the current chain state for the
+    /// duration of the simulation. Used by the sui-mev arb bot to dry-run
+    /// against an in-memory cache. Requires a configured `ipc_path` —
+    /// the upstream JSON-RPC server has no equivalent endpoint, so the
+    /// HTTP fallback returns an error instead of silently routing to a
+    /// stock dry-run that would ignore the overrides.
+    pub async fn dry_run_transaction_block_override(
+        &self,
+        tx: sui_types::transaction::TransactionData,
+        override_objects: Vec<(sui_types::base_types::ObjectID, sui_types::object::Object)>,
+    ) -> SuiRpcResult<DryRunTransactionBlockResponse> {
+        if let Some(ref ipc) = self.api.ipc {
+            ipc.dry_run_transaction_block_override(tx, override_objects)
+                .await
+                .map_err(|e| Error::IpcError(e.to_string()))
+        } else {
+            Err(Error::IpcError(
+                "dry_run_transaction_block_override requires an --ipc-path; \
+                 not implemented over HTTP".to_string(),
+            ))
+        }
+    }
+
     /// Return the inspection of the transaction block, or an error upon failure.
     ///
     /// Use this function to inspect the current state of the network by running a programmable

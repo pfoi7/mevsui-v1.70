@@ -637,11 +637,14 @@ impl TransactionEffectsV2 {
             .collect();
         let changed_objects: Vec<_> = changed_objects.into_iter().collect();
 
-        let gas_object_index = gas_object.map(|gas_id| {
+        // Bugfix: avoid panic when the gas object isn't in changed_objects
+        // (e.g. system transactions that don't actually charge gas). Returning
+        // None here keeps the effect well-formed instead of unwrapping.
+        let gas_object_index = gas_object.and_then(|gas_id| {
             changed_objects
                 .iter()
                 .position(|(id, _)| id == &gas_id)
-                .unwrap() as u32
+                .map(|pos| pos as u32)
         });
 
         let result = Self {
