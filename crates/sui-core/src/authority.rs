@@ -106,12 +106,11 @@ use tracing::{debug, error, info, instrument, warn};
 
 use self::authority_store::ExecutionLockWriteGuard;
 use self::authority_store_pruner::{AuthorityStorePruningMetrics, PrunerWatermarks};
-// SuiLockResult / ObjectLockStatus re-exported here so the sui-mev arb bot's
-// simulator crate (an out-of-tree consumer) can name the types when
-// implementing `ObjectCacheRead::get_lock`.
-pub use authority_store::{
-    AuthorityStore, ObjectLockStatus, ResolverWrapper, SuiLockResult, UpdateType,
-};
+// SuiLockResult re-exported here so the sui-mev arb bot's simulator crate
+// (an out-of-tree consumer) can name the trait method's return type. Only
+// SuiLockResult is added; ObjectLockStatus is already imported privately
+// near line 191 and would conflict.
+pub use authority_store::{AuthorityStore, ResolverWrapper, SuiLockResult, UpdateType};
 use mysten_metrics::{monitored_scope, spawn_monitored_task};
 
 use crate::jsonrpc_index::IndexStore;
